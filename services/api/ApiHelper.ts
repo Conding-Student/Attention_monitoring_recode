@@ -13,7 +13,7 @@ export interface ApiError extends Error {
 export interface ApiResponse<T = unknown> {
   response_time: string;
   device: string;
-  retCode: string;
+  retCode: string; 
   message: string;
   data: T | null;
 }
@@ -21,7 +21,7 @@ export interface ApiResponse<T = unknown> {
 // Wraps ApiResponse with the HTTP status code for server-side use
 export interface ApiRequestResult<TRes> {
   data: ApiResponse<TRes>;
-  status: number;
+  status: number; 
 }
 
 // Base factory — attaches ApiError fields to a plain Error object
@@ -56,10 +56,17 @@ export const isApiError = (error: unknown): error is ApiError =>
 // Handles ApiError specifically, falls back to 500 for anything unexpected
 export function handleRouteError(error: unknown): NextResponse {
   if (isApiError(error)) {
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: error.message, retCode: error.retCode },
       { status: error.statusCode },
     );
+
+    // Centralized: clear auth cookie on terminated/expired token
+    if (error.retCode === "104") {
+      response.cookies.delete("auth_token");
+    }
+
+    return response;
   }
 
   return NextResponse.json(
@@ -75,3 +82,4 @@ export function handleRouteError(error: unknown): NextResponse {
 // Avoids repeating `err instanceof Error ? err.message : "Unexpected error"` everywhere
 export const getErrorMessage = (err: unknown): string =>
   err instanceof Error ? err.message : "Unexpected error";
+ 

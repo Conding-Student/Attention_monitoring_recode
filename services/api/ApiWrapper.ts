@@ -25,23 +25,17 @@ async function getAuthToken(): Promise<string> {
     if (!decryptedToken) {
       throw createAuthError("Invalid session");
     }
-    console.log("✅ Auth token decrypted from cookie");
-    console.log("🔑 Auth token:", decryptedToken);
+
     return decryptedToken;
   } catch (error) {
-    console.error("❌ Failed to decrypt auth_token:", error);
     throw createAuthError("Invalid session");
   }
 }
-// async function getAuthToken(): Promise<string> {
-//   // Temporary hardcoded token for testing
-//   return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpCaXR1aW4iLCJzdGFmZl9pZCI6IjIwMjEwMi0zNTgyNSIsImZpcnN0X25hbWUiOiJKb2huIEFydmluIiwibWlkZGxlX25hbWUiOiJDb21wYcOxZXJvIiwibGFzdF9uYW1lIjoiQml0dWluIiwiZnVsbF9uYW1lIjoiSm9obiBBcnZpbiBDb21wYcOxZXJvIEJpdHVpbiIsImluc3RpX2NvZGUiOiI5ODY5IiwiaW5zdGlfbmFtZSI6IkJha2F3YW4gRGF0YSBBbmFseXRpY3MsIEluYy4iLCJleHAiOjE3ODAwNDQ1NzV9.XuQjIHDRbmEASFUnIEy780J_iArAhrpLMdI3GInNZ-w";
-// }
 
 function getEnvVar(key: string): string {
   const value = process.env[key];
   if (!value) {
-    throw new Error(`Environment variable ${key} is missing.`);
+    throw new Error(`Environment variable is missing.`);
   }
   return value;
 }
@@ -90,7 +84,7 @@ export async function apiRequest<TReq = unknown, TRes = unknown>(
     }
   }
 
-  console.log(`API Request: ${config.method} ${url.toString()}`);
+  // console.log(`API Request: ${config.method} ${url.toString()}`);
 
   // Setup headers
   const headers: Record<string, string> = {
@@ -128,14 +122,14 @@ export async function apiRequest<TReq = unknown, TRes = unknown>(
     throw err;
   }
 
+  // console.log("API Response:", result.retCode);
+
   if (result.retCode === "104") {
-    const cookieStore = await cookies();
-    cookieStore.delete("auth_token");
     throw createAuthError(result.message);
   }
 
   if (!response.ok) {
-    console.log("API Request Error:", response.status);
+    // console.log("API Request Error:", response.status);
     throw createRequestError(
       result.message || `HTTP ${response.status}`,
       response.status,
@@ -210,5 +204,6 @@ export async function apiRequestRaw<TReq = unknown>(
   }
 
   const body = await response.text();
+  console.log("API Response Body:", body);
   return { body, headers: response.headers, status: response.status };
 }
