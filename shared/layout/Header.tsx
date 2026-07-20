@@ -8,7 +8,7 @@ import {
   ChevronDown, LogOut, Lock, User as UserIcon, 
   ChevronRight, Settings, Bell, Search 
 } from "lucide-react";
-import { USER_MOCK } from "mockData";
+import { USER_MOCK } from "@/mockData";
 
 interface Breadcrumb {
   href: string;
