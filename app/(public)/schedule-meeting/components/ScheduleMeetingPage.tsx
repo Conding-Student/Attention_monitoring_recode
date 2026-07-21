@@ -12,7 +12,6 @@ import {
 
 import { durationOptions } from "../data/scheduleMeeting.data";
 import { useScheduleMeeting } from "../hooks/useScheduleMeeting";
-import ScheduleMeetingHeader from "./ScheduleMeetingHeader";
 
 export default function ScheduleMeetingPage() {
 	const {
@@ -25,7 +24,7 @@ export default function ScheduleMeetingPage() {
 
 	return (
 		<div className="min-h-dvh bg-white text-gray-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-			<ScheduleMeetingHeader />
+			
 
 			<main className="relative min-h-[calc(100dvh-72px)] overflow-hidden">
 				{/* Blurred background */}

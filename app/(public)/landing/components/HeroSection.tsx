@@ -1,4 +1,4 @@
-// app/(public)/_landing/components/HeroSection.tsx
+// app/(public)/landing/components/HeroSection.tsx
 
 import Image from "next/image";
 import Link from "next/link";
@@ -35,6 +35,7 @@ function HeroFeatureCard({
 				className="mt-auto flex items-center gap-1.5 pt-6 text-xs font-semibold text-[#07594b] transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
 			>
 				Explore
+
 				<ArrowRight size={13} />
 			</Link>
 		</article>
@@ -45,10 +46,46 @@ export default function HeroSection() {
 	return (
 		<section
 			id="home"
-			className="mx-auto grid max-w-[1440px] grid-cols-1 items-center gap-12 px-5 pb-24 pt-16 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-14 lg:pb-28 lg:pt-14"
+			className="
+				mx-auto grid max-w-[1440px] grid-cols-1
+				items-center gap-6 px-5 pb-24 pt-2
+				sm:gap-10 sm:px-8 sm:pt-6
+				lg:grid-cols-[0.92fr_1.08fr]
+				lg:gap-12 lg:px-14 lg:pb-28 lg:pt-14
+			"
 		>
-			<div className="relative z-20">
-				<h1 className="max-w-[620px] text-[42px] font-black leading-[0.98] tracking-[-0.04em] text-[#303234] transition-colors sm:text-5xl lg:text-[58px] dark:text-slate-100">
+			{/* 
+				Mobile: unang lalabas ang image.
+				Desktop: mapupunta ito sa right column.
+			*/}
+			<div
+				className="
+					relative z-10 order-1 mx-auto
+					-mt-2 min-h-[290px] w-full max-w-[560px]
+					sm:-mt-2 sm:min-h-[390px]
+					lg:order-2 lg:-mt-33
+					lg:min-h-[720px] lg:max-w-[800px]
+					lg:translate-x-5
+				"
+			>
+				<div className="absolute inset-8 rounded-full bg-emerald-100/40 blur-3xl transition-colors sm:inset-10 dark:bg-emerald-900/10" />
+
+				<Image
+					src="/landingpage_sidepanel.png"
+					alt="Attention monitoring meeting interface"
+					fill
+					priority
+					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 55vw"
+					className="object-contain object-top"
+				/>
+			</div>
+
+			{/* 
+				Mobile: susunod pagkatapos ng image.
+				Desktop: mapupunta ito sa left column.
+			*/}
+			<div className="relative z-20 order-2 lg:order-1">
+				<h1 className="max-w-[620px] text-[40px] font-black leading-[1.02] tracking-[-0.04em] text-[#303234] transition-colors sm:text-5xl lg:text-[58px] lg:leading-[0.98] dark:text-slate-100">
 					Attention Monitoring
 					<br />
 					Website Demonstration
@@ -63,21 +100,57 @@ export default function HeroSection() {
 				<form
 					action="/join-meeting"
 					method="get"
-					className="mt-7 flex max-w-[510px] flex-col gap-3 sm:flex-row sm:items-center"
+					className="mt-7 flex w-full max-w-[510px] flex-col gap-3 sm:flex-row sm:items-center"
 				>
 					<input
 						type="text"
 						name="code"
 						placeholder="Example: viw-m4b81"
-						className="h-11 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-4 text-sm text-gray-700 outline-none transition-colors placeholder:text-gray-400 focus:border-[#0a6a59] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-emerald-500"
+						className="
+							min-h-[52px] w-full min-w-0 rounded-xl
+							border border-gray-300 bg-white
+							px-4 py-3.5 text-base text-gray-700
+							outline-none transition-all
+							placeholder:text-gray-400
+							focus:border-[#07594b]
+							focus:ring-4 focus:ring-emerald-100/60
+
+							sm:h-11 sm:min-h-0 sm:flex-1
+							sm:rounded-lg sm:py-0 sm:text-sm
+
+							dark:border-slate-700
+							dark:bg-slate-900
+							dark:text-slate-100
+							dark:placeholder:text-slate-500
+							dark:focus:border-emerald-500
+							dark:focus:ring-emerald-950
+						"
 					/>
 
 					<button
 						type="submit"
-						className="flex h-11 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold text-[#07594b] transition-colors hover:bg-[#e9fbf5] dark:text-emerald-400 dark:hover:bg-emerald-950/50"
+						className="
+							group flex min-h-[52px] w-full
+							items-center justify-center gap-2
+							rounded-xl bg-[#07594b]
+							px-5 text-sm font-semibold text-white
+							transition-all
+							hover:bg-[#064c40]
+							active:scale-[0.98]
+
+							sm:h-11 sm:min-h-0 sm:w-auto
+							sm:shrink-0 sm:rounded-lg
+
+							dark:bg-emerald-600
+							dark:hover:bg-emerald-500
+						"
 					>
 						Join Meeting
-						<ArrowRight size={17} />
+
+						<ArrowRight
+							size={17}
+							className="transition-transform group-hover:translate-x-1"
+						/>
 					</button>
 				</form>
 
@@ -92,19 +165,6 @@ export default function HeroSection() {
 						/>
 					))}
 				</div>
-			</div>
-
-			<div className="relative z-10 mx-auto min-h-[440px] w-full max-w-[800px] lg:-mt-28 lg:min-h-[720px] lg:translate-x-5">
-				<div className="absolute inset-10 rounded-full bg-emerald-100/40 blur-3xl transition-colors dark:bg-emerald-900/10" />
-
-				<Image
-					src="/landingpage_sidepanel.png"
-					alt="Attention monitoring meeting interface"
-					fill
-					priority
-					sizes="(max-width: 1024px) 100vw, 55vw"
-					className="object-contain object-top"
-				/>
 			</div>
 		</section>
 	);

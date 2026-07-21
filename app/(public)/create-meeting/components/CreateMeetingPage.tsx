@@ -11,8 +11,6 @@ import {
 } from "lucide-react";
 
 import { useCreateMeeting } from "../hooks/useCreateMeeting";
-import CreateMeetingHeader from "./CreateMeetingHeader";
-
 interface CreateMeetingPageProps {
 	initialMeetingCode: string;
 }
@@ -36,7 +34,7 @@ export default function CreateMeetingPage({
 
 	return (
 		<div className="min-h-dvh bg-white text-gray-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-			<CreateMeetingHeader />
+			
 
 			<main className="relative min-h-[calc(100dvh-72px)] overflow-hidden">
 				{/* Blurred background */}

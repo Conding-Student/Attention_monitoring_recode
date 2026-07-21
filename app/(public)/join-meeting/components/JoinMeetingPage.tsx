@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 
 import { useJoinMeeting } from "../hooks/useJoinMeeting";
-import JoinMeetingHeader from "./JoinMeetingHeader";
-
 interface JoinMeetingPageProps {
 	initialMeetingValue?: string;
 }
@@ -30,7 +28,7 @@ export default function JoinMeetingPage({
 
 	return (
 		<div className="min-h-dvh bg-white text-gray-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-			<JoinMeetingHeader />
+			
 
 			<main className="relative min-h-[calc(100dvh-72px)] overflow-hidden">
 				{/* Blurred background */}
