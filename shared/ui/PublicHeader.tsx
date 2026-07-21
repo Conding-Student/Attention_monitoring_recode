@@ -10,7 +10,6 @@ import {
 	ArrowRight,
 	CalendarDays,
 	Menu,
-	Video,
 	X,
 } from "lucide-react";
 
