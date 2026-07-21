@@ -43,12 +43,9 @@ export function useTheme() {
 		const rootElement = document.documentElement;
 
 		const currentTheme: Theme =
-			rootElement.classList.contains("dark")
-				? "dark"
-				: "light";
+			rootElement.classList.contains("dark") ? "dark": "light";
 
-		const nextTheme: Theme =
-			currentTheme === "dark" ? "light" : "dark";
+		const nextTheme: Theme = currentTheme === "dark" ? "light" : "dark";
 
 		applyTheme(nextTheme);
 

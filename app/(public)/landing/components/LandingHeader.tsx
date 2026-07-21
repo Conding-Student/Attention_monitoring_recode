@@ -11,8 +11,7 @@ import { navigationItems } from "../data/landing.data";
 import ThemeToggle from "./ThemeToggle";
 
 export default function LandingHeader() {
-	const [isMobileMenuOpen, setIsMobileMenuOpen] =
-		useState(false);
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
 	const closeMobileMenu = () => {
 		setIsMobileMenuOpen(false);
@@ -67,7 +66,7 @@ export default function LandingHeader() {
 					<ThemeToggle />
 
 					<Link
-						href="/dashboard"
+						href="/create-meeting"
 						className="hidden rounded-lg bg-[#07594b] px-5 py-3 text-xs font-semibold text-white transition-all hover:bg-[#064c40] active:scale-[0.98] lg:inline-flex dark:bg-emerald-600 dark:hover:bg-emerald-500"
 					>
 						Create Meeting
