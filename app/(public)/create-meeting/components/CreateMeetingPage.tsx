@@ -186,7 +186,7 @@ export default function CreateMeetingPage({
 							<span>Have a code?</span>
 
 							<Link
-								href="/#home"
+								href="/join-meeting"
 								className="font-semibold text-[#07594b] underline decoration-[#07594b]/50 underline-offset-4 transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:decoration-emerald-400/50 dark:hover:text-emerald-300"
 							>
 								Join an existing meeting

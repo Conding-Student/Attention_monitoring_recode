@@ -61,13 +61,13 @@ export default function HeroSection() {
 				</p>
 
 				<form
-					action="/dashboard"
+					action="/join-meeting"
 					method="get"
 					className="mt-7 flex max-w-[510px] flex-col gap-3 sm:flex-row sm:items-center"
 				>
 					<input
 						type="text"
-						name="room"
+						name="code"
 						placeholder="Example: viw-m4b81"
 						className="h-11 min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-4 text-sm text-gray-700 outline-none transition-colors placeholder:text-gray-400 focus:border-[#0a6a59] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-emerald-500"
 					/>
