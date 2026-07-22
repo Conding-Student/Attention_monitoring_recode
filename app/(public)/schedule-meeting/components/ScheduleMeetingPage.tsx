@@ -23,10 +23,10 @@ export default function ScheduleMeetingPage() {
 	} = useScheduleMeeting();
 
 	return (
-		<div className="min-h-dvh bg-white text-gray-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+		<div className="min-h-dvh text-gray-900 transition-colors duration-300 dark:text-slate-100">
 			
 
-			<main className="relative min-h-[calc(100dvh-72px)] overflow-hidden">
+			<main className="relative min-h-[calc(100dvh-72px)] bg-transparent">
 				{/* Blurred background */}
 				<div
 					aria-hidden="true"
