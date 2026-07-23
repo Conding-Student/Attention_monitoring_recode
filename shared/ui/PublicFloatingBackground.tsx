@@ -218,15 +218,16 @@ export default function PublicFloatingBackground() {
 						`}
 					>
 						<Icon
-							strokeWidth={1.35}
-							className={`
-								public-floating-object-icon
-								${item.size}
-								text-cyan-200/60
-								drop-shadow-sm
-								dark:text-emerald-800/35
-							`}
-						/>
+	strokeWidth={1.7}
+	className={`
+		public-floating-object-icon
+		${item.size}
+		text-cyan-400/70
+		drop-shadow-[0_0_8px_rgba(34,211,238,0.25)]
+		dark:text-emerald-400/60
+		dark:drop-shadow-[0_0_10px_rgba(52,211,153,0.30)]
+	`}
+/>
 					</span>
 				);
 			})}
