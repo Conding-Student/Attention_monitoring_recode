@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import PublicBackgroundDecorations from "@/shared/ui/PublicBackgroundDecorations";
+import PublicFloatingBackground from "@/shared/ui/PublicFloatingBackground";
 import PublicHeader from "@/shared/ui/PublicHeader";
 
 interface PublicLayoutProps {
@@ -14,15 +14,13 @@ export default function PublicLayout({
 }: PublicLayoutProps) {
 	return (
 		<div className="relative isolate min-h-dvh overflow-x-clip bg-white text-gray-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-			<PublicBackgroundDecorations />
+			<PublicFloatingBackground />
 
-			<div className="relative z-10 flex min-h-dvh flex-col">
-				<PublicHeader />
+			<PublicHeader />
 
-				<div className="relative flex-1">
-					{children}
-				</div>
-			</div>
+
+				{children}
+
 		</div>
 	);
 }

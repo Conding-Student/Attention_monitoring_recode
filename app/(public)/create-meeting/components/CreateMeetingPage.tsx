@@ -35,7 +35,7 @@ export default function CreateMeetingPage({
 
 	return (
 		<main className="relative min-h-[calc(100dvh-72px)] bg-transparent">
-			<section className="relative mx-auto flex min-h-[calc(100dvh-72px)] max-w-[940px] flex-col items-center justify-center px-4 py-5 sm:px-6 sm:py-7">
+			<section className="relative z-10 mx-auto flex min-h-[calc(100dvh-72px)] max-w-[940px] flex-col items-center justify-center px-4 py-5 sm:px-6 sm:py-7">
 				{/* Highlighted glass card */}
 				<div className="w-full max-w-[760px] rounded-[24px] border border-white/70 bg-white/75 px-5 py-6 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl transition-colors sm:px-8 sm:py-7 dark:border-slate-700/60 dark:bg-slate-900/70 dark:shadow-[0_24px_70px_rgba(0,0,0,0.4)]">
 					<header className="mb-6 text-center">
