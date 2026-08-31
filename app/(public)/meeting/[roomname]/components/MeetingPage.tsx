@@ -3,10 +3,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  LiveKitRoom,
-  VideoConference,
-} from "@livekit/components-react";
+import { LiveKitRoom, VideoConference } from "@livekit/components-react";
+import { useRouter } from "next/navigation";
 
 interface MeetingPageProps {
   roomName: string;
@@ -14,11 +12,7 @@ interface MeetingPageProps {
   role: string;
 }
 
-export default function MeetingPage({
-  roomName,
-  meetingName,
-  role,
-}: MeetingPageProps) {
+export default function MeetingPage({ roomName, meetingName, role }: MeetingPageProps) {
   const [token, setToken] = useState("");
 
   useEffect(() => {
@@ -48,15 +42,17 @@ export default function MeetingPage({
 
   return (
     <LiveKitRoom
-    token={token}
-    serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
-    connect
-    video
-    audio
-    data-lk-theme="default"
-    style={{ height: "calc(100dvh - 72px)" }}
+      token={token}
+      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+      connect
+      video
+      audio
+      data-lk-theme="default"
+      style={{ height: "calc(100dvh - 72px)" }}
+      onDisconnected={() => window.location.replace("/")}
     >
-    <VideoConference/>
+      {meetingName && <div className="absolute left-4 top-4 z-20 rounded-lg bg-black/60 px-3 py-2 text-sm font-semibold text-white">{meetingName}</div>}
+      <VideoConference />
     </LiveKitRoom>
   );
 }
