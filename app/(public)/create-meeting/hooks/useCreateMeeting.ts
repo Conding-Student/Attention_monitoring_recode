@@ -2,153 +2,108 @@
 
 "use client";
 
-import {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type CopiedField = "code" | "link" | null;
 
 interface UseCreateMeetingParameters {
-	initialMeetingCode: string;
+  initialMeetingCode: string;
 }
 
-const APP_BASE_URL = (
-	process.env.NEXT_PUBLIC_APP_URL ??
-	"http://localhost:3000"
-).replace(/\/$/, "");
+const APP_BASE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
-export function useCreateMeeting({
-	initialMeetingCode,
-}: UseCreateMeetingParameters) {
-	const router = useRouter();
+export function useCreateMeeting({ initialMeetingCode }: UseCreateMeetingParameters) {
+  const router = useRouter();
+  const copiedTimeoutReference = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [meetingName, setMeetingName] = useState("");
+  const [copiedField, setCopiedField] = useState<CopiedField>(null);
+  const [error, setError] = useState<string | null>(null);
+  const meetingSlug = useMemo(() => initialMeetingCode.toLowerCase(), [initialMeetingCode]);
 
-	const copiedTimeoutReference =
-		useRef<ReturnType<typeof setTimeout> | null>(null);
+const shareLink = `${APP_BASE_URL}/meeting/${meetingSlug}?meetingName=${encodeURIComponent(meetingName)}&role=participant`;
 
-	const [meetingName, setMeetingName] = useState("");
-	const [copiedField, setCopiedField] =
-		useState<CopiedField>(null);
-	const [error, setError] = useState<string | null>(null);
+  const displayShareLink = useMemo(() => shareLink.replace(/^https?:\/\//, ""), [shareLink]);
 
-	const meetingSlug = useMemo(
-		() => initialMeetingCode.toLowerCase(),
-		[initialMeetingCode],
-	);
+  useEffect(() => {
+    return () => {
+      if (copiedTimeoutReference.current) {
+        clearTimeout(copiedTimeoutReference.current);
+      }
+    };
+  }, []);
 
-	const shareLink = useMemo(
-		() => `${APP_BASE_URL}/meeting/${meetingSlug}`,
-		[meetingSlug],
-	);
+  const markAsCopied = useCallback((field: Exclude<CopiedField, null>) => {
+    if (copiedTimeoutReference.current) {
+      clearTimeout(copiedTimeoutReference.current);
+    }
 
-	const displayShareLink = useMemo(
-		() => shareLink.replace(/^https?:\/\//, ""),
-		[shareLink],
-	);
+    setCopiedField(field);
 
-	useEffect(() => {
-		return () => {
-			if (copiedTimeoutReference.current) {
-				clearTimeout(copiedTimeoutReference.current);
-			}
-		};
-	}, []);
+    copiedTimeoutReference.current = setTimeout(() => {
+      setCopiedField(null);
+    }, 1800);
+  }, []);
 
-	const markAsCopied = useCallback(
-		(field: Exclude<CopiedField, null>) => {
-			if (copiedTimeoutReference.current) {
-				clearTimeout(copiedTimeoutReference.current);
-			}
+  const copyValue = useCallback(
+    async (value: string, field: Exclude<CopiedField, null>) => {
+      setError(null);
 
-			setCopiedField(field);
+      try {
+        await navigator.clipboard.writeText(value);
+        markAsCopied(field);
+      } catch {
+        setError("Unable to copy automatically. Please copy it manually.");
+      }
+    },
+    [markAsCopied],
+  );
 
-			copiedTimeoutReference.current = setTimeout(() => {
-				setCopiedField(null);
-			}, 1800);
-		},
-		[],
-	);
+  const copyMeetingCode = useCallback(async () => {
+    await copyValue(initialMeetingCode, "code");
+  }, [copyValue, initialMeetingCode]);
 
-	const copyValue = useCallback(
-		async (
-			value: string,
-			field: Exclude<CopiedField, null>,
-		) => {
-			setError(null);
+  const copyShareLink = useCallback(async () => {
+    await copyValue(shareLink, "link");
+  }, [copyValue, shareLink]);
 
-			try {
-				await navigator.clipboard.writeText(value);
-				markAsCopied(field);
-			} catch {
-				setError(
-					"Unable to copy automatically. Please copy it manually.",
-				);
-			}
-		},
-		[markAsCopied],
-	);
+  const handleMeetingNameChange = useCallback(
+    (value: string) => {
+      setMeetingName(value);
 
-	const copyMeetingCode = useCallback(async () => {
-		await copyValue(initialMeetingCode, "code");
-	}, [copyValue, initialMeetingCode]);
+      if (error) {
+        setError(null);
+      }
+    },
+    [error],
+  );
 
-	const copyShareLink = useCallback(async () => {
-		await copyValue(shareLink, "link");
-	}, [copyValue, shareLink]);
+const startMeeting = () => {
+  const name = meetingName.trim();
 
-	const handleMeetingNameChange = useCallback(
-		(value: string) => {
-			setMeetingName(value);
+  if (!name) {
+    setError("Please provide a meeting name.");
+    return;
+  }
 
-			if (error) {
-				setError(null);
-			}
-		},
-		[error],
-	);
+  const params = new URLSearchParams({
+    meetingName: name,
+    role: "host",
+  });
 
-	const startMeeting = useCallback(() => {
-		const normalizedMeetingName = meetingName.trim();
+  router.push(`/meeting/${meetingSlug}?${params}`);
+};
 
-		if (!normalizedMeetingName) {
-			setError("Please provide a meeting name.");
-			return;
-		}
-
-		const searchParameters = new URLSearchParams({
-			meetingCode: initialMeetingCode,
-			meetingName: normalizedMeetingName,
-			role: "host",
-		});
-
-		/*
-		 * Temporary destination while the actual
-		 * /meeting/[roomname] page is not yet available.
-		 *
-		 * Later, this may be changed to:
-		 * router.push(`/meeting/${meetingSlug}?${searchParameters}`)
-		 */
-		router.push(`/dashboard?${searchParameters.toString()}`);
-	}, [
-		initialMeetingCode,
-		meetingName,
-		router,
-	]);
-
-	return {
-		meetingName,
-		meetingCode: initialMeetingCode,
-		shareLink,
-		displayShareLink,
-		copiedField,
-		error,
-		handleMeetingNameChange,
-		copyMeetingCode,
-		copyShareLink,
-		startMeeting,
-	};
+  return {
+    meetingName,
+    meetingCode: initialMeetingCode,
+    shareLink,
+    displayShareLink,
+    copiedField,
+    error,
+    handleMeetingNameChange,
+    copyMeetingCode,
+    copyShareLink,
+    startMeeting,
+  };
 }

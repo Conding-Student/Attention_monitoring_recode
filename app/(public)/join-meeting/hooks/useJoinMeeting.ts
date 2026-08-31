@@ -2,123 +2,68 @@
 
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface UseJoinMeetingParameters {
-	initialMeetingValue?: string;
-}
-
-function extractMeetingIdentifier(value: string): string {
-	const normalizedValue = value.trim();
-
-	if (!normalizedValue) {
-		return "";
-	}
-
-	const isFullUrl =
-		normalizedValue.startsWith("http://") ||
-		normalizedValue.startsWith("https://");
-
-	if (isFullUrl) {
-		try {
-			const parsedUrl = new URL(normalizedValue);
-
-			const pathSegments = parsedUrl.pathname
-				.split("/")
-				.filter(Boolean);
-
-			const meetingSegmentIndex =
-				pathSegments.lastIndexOf("meeting");
-
-			if (
-				meetingSegmentIndex >= 0 &&
-				pathSegments[meetingSegmentIndex + 1]
-			) {
-				return pathSegments[meetingSegmentIndex + 1];
-			}
-
-			return pathSegments.at(-1) ?? "";
-		} catch {
-			return "";
-		}
-	}
-
-	const valueWithoutQuery = normalizedValue
-		.split("?")[0]
-		.split("#")[0];
-
-	const pathSegments = valueWithoutQuery
-		.split("/")
-		.filter(Boolean);
-
-	return pathSegments.at(-1) ?? "";
-}
-
-function isValidMeetingIdentifier(value: string): boolean {
-	return /^[a-zA-Z0-9_-]{3,100}$/.test(value);
+  initialMeetingValue?: string;
 }
 
 export function useJoinMeeting({
-	initialMeetingValue = "",
+  initialMeetingValue = "",
 }: UseJoinMeetingParameters) {
-	const router = useRouter();
+  const router = useRouter();
 
-	const [meetingValue, setMeetingValue] = useState(
-		initialMeetingValue,
-	);
+  const [meetingValue, setMeetingValue] = useState(initialMeetingValue);
+  const [error, setError] = useState<string | null>(null);
 
-	const [error, setError] = useState<string | null>(null);
+  const handleMeetingValueChange = (value: string) => {
+    setMeetingValue(value);
+    setError(null);
+  };
 
-	const handleMeetingValueChange = useCallback(
-		(value: string) => {
-			setMeetingValue(value);
+  const joinMeeting = () => {
+    const value = meetingValue.trim();
 
-			if (error) {
-				setError(null);
-			}
-		},
-		[error],
-	);
+    if (!value) {
+      setError("Please enter a meeting code or link.");
+      return;
+    }
 
-	const joinMeeting = useCallback(() => {
-		const meetingIdentifier =
-			extractMeetingIdentifier(meetingValue);
+    let meetingCode = value;
+    let meetingName = "";
 
-		if (!meetingValue.trim()) {
-			setError("Please enter a meeting code or link.");
-			return;
-		}
+    if (value.startsWith("http")) {
+      const url = new URL(value);
 
-		if (!meetingIdentifier) {
-			setError(
-				"We could not find a valid meeting code in that link.",
-			);
-			return;
-		}
+      meetingCode =
+        url.pathname.split("/").filter(Boolean).at(-1) ?? "";
 
-		if (!isValidMeetingIdentifier(meetingIdentifier)) {
-			setError(
-				"Please enter a valid meeting code or meeting link.",
-			);
-			return;
-		}
+      meetingName = url.searchParams.get("meetingName") ?? "";
+    }
 
-		const searchParameters = new URLSearchParams({
-			role: "participant",
-		});
+    if (!/^[A-Z]{3}-\d{4}-[A-Z]$/i.test(meetingCode)) {
+      setError("Please enter a valid meeting code or link.");
+      return;
+    }
 
-		router.push(
-			`/meeting/${encodeURIComponent(
-				meetingIdentifier,
-			)}?${searchParameters.toString()}`,
-		);
-	}, [meetingValue, router]);
+    const params = new URLSearchParams({
+      role: "participant",
+    });
 
-	return {
-		meetingValue,
-		error,
-		handleMeetingValueChange,
-		joinMeeting,
-	};
+    if (meetingName) {
+      params.set("meetingName", meetingName);
+    }
+
+    router.push(
+      `/meeting/${meetingCode.toLowerCase()}?${params.toString()}`,
+    );
+  };
+
+  return {
+    meetingValue,
+    error,
+    handleMeetingValueChange,
+    joinMeeting,
+  };
 }
