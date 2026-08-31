@@ -48,15 +48,15 @@ export default function MeetingPage({
 
   return (
     <LiveKitRoom
-      token={token}
-      serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
-      connect
-      video
-      audio
-      data-lk-theme="default"
-      className="h-screen"
+    token={token}
+    serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
+    connect
+    video
+    audio
+    data-lk-theme="default"
+    style={{ height: "calc(100dvh - 72px)" }}
     >
-      <VideoConference />
+    <VideoConference/>
     </LiveKitRoom>
   );
 }

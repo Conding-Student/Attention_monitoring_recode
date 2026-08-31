@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@livekit/components-styles";
 import "./globals.css";
 import { ToastContainer } from "@/shared/ui/ToastContainer";
 

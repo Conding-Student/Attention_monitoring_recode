@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 
 import PublicBackgroundDecorations from "@/shared/ui/PublicBackgroundDecorations";
 import PublicHeader from "@/shared/ui/PublicHeader";
-import "@livekit/components-styles";
 
 interface PublicLayoutProps {
 	children: ReactNode;
