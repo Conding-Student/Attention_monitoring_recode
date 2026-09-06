@@ -89,7 +89,7 @@ export default function FeaturesSection() {
 							</p>
 
 							<Link
-								href="/dashboard"
+								href="/attention-monitoring"
 								className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#07594b] transition-transform hover:scale-[1.03]"
 							>
 								Learn more

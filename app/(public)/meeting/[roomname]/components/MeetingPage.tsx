@@ -4,7 +4,6 @@
 
 import { useEffect, useState } from "react";
 import { LiveKitRoom, VideoConference } from "@livekit/components-react";
-import { useRouter } from "next/navigation";
 
 interface MeetingPageProps {
   roomName: string;

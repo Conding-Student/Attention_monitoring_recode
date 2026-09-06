@@ -31,7 +31,7 @@ function HeroFeatureCard({
 			</p>
 
 			<Link
-				href="#documentation"
+				href="/attention-monitoring"
 				className="mt-auto flex items-center gap-1.5 pt-6 text-xs font-semibold text-[#07594b] transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
 			>
 				Explore
