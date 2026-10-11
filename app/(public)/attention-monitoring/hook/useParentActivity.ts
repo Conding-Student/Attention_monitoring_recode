@@ -27,11 +27,13 @@ export function useParentActivity(videoRef: RefObject<HTMLVideoElement | null>) 
       if (video && !video.paused && !video.ended) notifyActivity();
     };
     notifyActivity();
+    window.addEventListener("pointermove", handleInteraction);
     window.addEventListener("pointerdown", handleInteraction);
     window.addEventListener("keydown", handleInteraction);
     video?.addEventListener("timeupdate", handlePlayback);
 
     return () => {
+      window.removeEventListener("pointermove", handleInteraction);
       window.removeEventListener("pointerdown", handleInteraction);
       window.removeEventListener("keydown", handleInteraction);
       video?.removeEventListener("timeupdate", handlePlayback);
