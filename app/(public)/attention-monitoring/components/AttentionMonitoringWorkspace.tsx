@@ -2,13 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Camera, CircleStop, Eye, Pause, Play, ScanFace } from "lucide-react";
+import { Bug, Camera, CircleStop, Eye, Pause, Play, ScanFace } from "lucide-react";
 
-import { MonitorIssue,useAttentionDetection } from "../hook/useAttentionDetection";
+import { type MonitorIssue, useAttentionDetection } from "../hook/useAttentionDetection";
 
+// =========================================================
+// DEBUG UI
+//
+// true  = show debug panel
+// false = hide debug panel
+// =========================================================
 
+const SHOW_DEBUG_UI = true;
 
-export default function AttentionMonitoringWorkspace() {
+// =========================================================
+// COMPONENT
+// =========================================================
+
+export default function AttentionMonitoringWorkspace({ token }: { token: string }) {
   const demoVideoRef = useRef<HTMLVideoElement>(null);
 
   const cameraVideoRef = useRef<HTMLVideoElement>(null);
@@ -21,31 +32,33 @@ export default function AttentionMonitoringWorkspace() {
 
   const [isDetecting, setIsDetecting] = useState(false);
 
-  const { isReady, issue, showWarning, warningSeconds, debugInfo } = useAttentionDetection({
+  const { isReady, issue, showWarning, debugInfo } = useAttentionDetection({
+    token,
     videoRef: cameraVideoRef,
     isDetecting,
   });
 
-  // Raw issue exists but confirmed issue
-  // is still LOOKING = currently checking.
-  const isChecking = isDetecting && issue === "LOOKING" && debugInfo.issue !== "LOOKING";
-
-  const checkingIssue = isChecking ? debugInfo.issue : null;
+  // =======================================================
+  // DEMO VIDEO PLAY / PAUSE
+  // =======================================================
 
   const handlePlayPause = async () => {
     const video = demoVideoRef.current;
 
-    if (!video) {
-      return;
-    }
+    if (!video) return;
 
     if (video.paused) {
       await video.play();
+
       return;
     }
 
     video.pause();
   };
+
+  // =======================================================
+  // START DETECTION
+  // =======================================================
 
   const startDetection = async () => {
     try {
@@ -70,6 +83,10 @@ export default function AttentionMonitoringWorkspace() {
     }
   };
 
+  // =======================================================
+  // STOP DETECTION
+  // =======================================================
+
   const stopDetection = () => {
     setIsDetecting(false);
 
@@ -83,8 +100,8 @@ export default function AttentionMonitoringWorkspace() {
       cameraVideoRef.current.srcObject = null;
     }
 
-    // Resume only if attention monitoring
-    // was the one that paused the video.
+    // Resume demo video only if
+    // attention monitoring paused it.
     if (pausedByAttentionRef.current) {
       demoVideoRef.current?.play().catch(() => {});
 
@@ -95,14 +112,22 @@ export default function AttentionMonitoringWorkspace() {
   const handleDetection = () => {
     if (isDetecting) {
       stopDetection();
+
       return;
     }
 
     startDetection();
   };
 
-  // Confirmed attention issue -> pause.
-  // Attentive again -> resume.
+  // =======================================================
+  // ATTENTION VIDEO CONTROL
+  //
+  // RAW detection muna.
+  //
+  // LOOKING      -> play/resume
+  // anything else -> pause
+  // =======================================================
+
   useEffect(() => {
     const video = demoVideoRef.current;
 
@@ -127,6 +152,10 @@ export default function AttentionMonitoringWorkspace() {
     }
   }, [issue, showWarning, isDetecting]);
 
+  // =======================================================
+  // CLEANUP CAMERA
+  // =======================================================
+
   useEffect(() => {
     return () => {
       cameraStreamRef.current?.getTracks().forEach((track) => {
@@ -135,9 +164,16 @@ export default function AttentionMonitoringWorkspace() {
     };
   }, []);
 
+  // =======================================================
+  // UI
+  // =======================================================
+
   return (
     <main className="mx-auto flex min-h-[calc(100dvh-72px)] max-w-[1280px] flex-col px-5 py-5 sm:px-8 lg:h-[calc(100dvh-72px)] lg:overflow-hidden lg:px-10">
-      {/* Heading */}
+      {/* ================================================= */}
+      {/* HEADING */}
+      {/* ================================================= */}
+
       <header className="shrink-0">
         <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-300">
           <Eye size={13} />
@@ -148,14 +184,18 @@ export default function AttentionMonitoringWorkspace() {
           Video Attention <span className="text-[#0a9b87] dark:text-emerald-400">Checker</span>
         </h1>
 
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-500 dark:text-slate-400">
-          Play a video while monitoring participant attention through the camera. The video automatically pauses when a confirmed attention issue is detected.
-        </p>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-500 dark:text-slate-400">Play a video while monitoring participant attention through the camera.</p>
       </header>
 
-      {/* Workspace */}
+      {/* ================================================= */}
+      {/* WORKSPACE */}
+      {/* ================================================= */}
+
       <div className="mt-5 grid min-h-0 flex-1 gap-5 lg:grid-cols-[minmax(0,1fr)_350px]">
-        {/* Demo Video */}
+        {/* =============================================== */}
+        {/* DEMO VIDEO */}
+        {/* =============================================== */}
+
         <section className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-3 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70">
           <div className="flex shrink-0 items-center justify-between px-2 pb-3">
             <div>
@@ -190,6 +230,8 @@ export default function AttentionMonitoringWorkspace() {
           </div>
 
           <div className="flex shrink-0 flex-wrap gap-3 pt-3">
+            {/* PLAY / PAUSE */}
+
             <button
               type="button"
               onClick={handlePlayPause}
@@ -199,6 +241,8 @@ export default function AttentionMonitoringWorkspace() {
 
               {isPlaying ? "Pause Video" : "Play Video"}
             </button>
+
+            {/* START / STOP DETECTION */}
 
             <button
               type="button"
@@ -216,9 +260,15 @@ export default function AttentionMonitoringWorkspace() {
           </div>
         </section>
 
-        {/* Right Side */}
+        {/* =============================================== */}
+        {/* RIGHT SIDE */}
+        {/* =============================================== */}
+
         <aside className="flex min-h-0 flex-col gap-4">
-          {/* Camera Preview */}
+          {/* ============================================= */}
+          {/* CAMERA PREVIEW */}
+          {/* ============================================= */}
+
           <section className="shrink-0 rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70">
             <div className="mb-3 flex items-center gap-2">
               <Camera size={17} className="text-[#07594b] dark:text-emerald-400" />
@@ -239,8 +289,11 @@ export default function AttentionMonitoringWorkspace() {
             </div>
           </section>
 
-          {/* Attention Status */}
-          <section className={`shrink-0 rounded-2xl border p-4 ${getStatusClasses(issue, isDetecting, isReady, isChecking)}`}>
+          {/* ============================================= */}
+          {/* ATTENTION STATUS */}
+          {/* ============================================= */}
+
+          <section className={`shrink-0 rounded-2xl border p-4 ${getStatusClasses(issue, isDetecting, isReady)}`}>
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <ScanFace size={16} />
@@ -248,47 +301,120 @@ export default function AttentionMonitoringWorkspace() {
                 <p className="text-[11px] font-bold uppercase tracking-[0.14em]">Attention Status</p>
               </div>
 
-              <span className={`h-2.5 w-2.5 rounded-full ${getStatusDot(issue, isDetecting, isReady, isChecking)}`} />
+              <span className={`h-2.5 w-2.5 rounded-full ${getStatusDot(issue, isDetecting, isReady)}`} />
             </div>
 
-            <p className="mt-3 text-sm font-bold">{isChecking ? "Checking" : getAttentionLabel(issue, isDetecting, isReady)}</p>
+            <p className="mt-3 text-sm font-bold">{getAttentionLabel(issue, isDetecting, isReady)}</p>
 
-            <p className="mt-1 text-xs opacity-75">{isChecking ? getCheckingMessage(checkingIssue) : getAttentionMessage(issue, isDetecting, isReady)}</p>
-
-            {isChecking && checkingIssue && <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide opacity-70">Detected: {getRawIssueLabel(checkingIssue)}</p>}
-
-            {showWarning && <p className="mt-2 text-[11px] font-medium">Detected for {warningSeconds}s</p>}
+            <p className="mt-1 text-xs opacity-75">{getAttentionMessage(issue, isDetecting, isReady)}</p>
           </section>
 
-          {/* Rules */}
-          {/* Detection Rules */}
+          {/* ============================================= */}
+          {/* DEBUG UI */}
+          {/* ============================================= */}
+
+          {SHOW_DEBUG_UI && (
+            <section className="shrink-0 rounded-2xl border border-violet-200 bg-violet-50/70 p-4 text-violet-950 shadow-sm dark:border-violet-900 dark:bg-violet-950/20 dark:text-violet-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bug size={16} />
+
+                  <h2 className="text-xs font-bold uppercase tracking-[0.12em]">Detection Debug</h2>
+                </div>
+
+                <span className="text-[10px] font-medium opacity-60">RAW</span>
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {/* FACE COUNT */}
+
+                <DebugValue label="Face Count" value={debugInfo.faceCount} good={debugInfo.faceCount === 1} />
+
+                {/* RAW ISSUE */}
+
+                <DebugValue label="Raw Issue" value={debugInfo.issue} good={debugInfo.issue === "LOOKING"} />
+
+                {/* LEFT EYE */}
+
+                <DebugValue label="Left Eye" value={debugInfo.leftEyeOpen ? "OPEN" : "CLOSED"} good={debugInfo.leftEyeOpen} />
+
+                {/* RIGHT EYE */}
+
+                <DebugValue label="Right Eye" value={debugInfo.rightEyeOpen ? "OPEN" : "CLOSED"} good={debugInfo.rightEyeOpen} />
+
+                {/* LEFT BLINK SCORE */}
+
+                <DebugValue label="Left Blink" value={formatDebugNumber(debugInfo.leftBlink)} />
+
+                {/* RIGHT BLINK SCORE */}
+
+                <DebugValue label="Right Blink" value={formatDebugNumber(debugInfo.rightBlink)} />
+
+                {/* GAZE X */}
+
+                <DebugValue label="Gaze X" value={formatDebugNumber(debugInfo.gazeX)} />
+
+                {/* GAZE Y */}
+
+                <DebugValue label="Gaze Y" value={formatDebugNumber(debugInfo.gazeY)} />
+
+                {/* IRIS RESULT */}
+
+                <DebugValue label="Iris" value={debugInfo.irisOnScreen ? "ON SCREEN" : "AWAY"} good={debugInfo.irisOnScreen} />
+
+                {/* BLENDSHAPE RESULT */}
+
+                <DebugValue label="Blendshape" value={debugInfo.blendshapeOnScreen ? "ON SCREEN" : "AWAY"} good={debugInfo.blendshapeOnScreen} />
+
+                {/* STRONGEST EYE LOOK */}
+
+                <DebugValue label="Eye Look" value={formatDebugNumber(debugInfo.strongestEyeLook)} />
+              </div>
+
+              {/* REASON */}
+
+              <div className="mt-3 rounded-lg bg-white/60 px-3 py-2 text-[11px] leading-4 dark:bg-slate-950/30">
+                <span className="font-semibold">Reason:</span> {debugInfo.note ?? "-"}
+              </div>
+            </section>
+          )}
+
+          {/* ============================================= */}
+          {/* DETECTION RULES */}
+          {/* ============================================= */}
+
           <section className="min-h-0 flex-1 rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/70">
             <h2 className="text-sm font-bold text-gray-800 dark:text-slate-100">Detection Rules</h2>
 
             <ul className="mt-4 space-y-2.5 text-xs leading-5 text-gray-500 dark:text-slate-400">
               <li className="flex gap-2">
                 <span className="text-[#0a9b87]">•</span>
-                <span>Closed eyes are checked before being confirmed.</span>
+
+                <span>Exactly one face must be visible.</span>
               </li>
 
               <li className="flex gap-2">
                 <span className="text-[#0a9b87]">•</span>
-                <span>Normal blinks do not immediately pause the video.</span>
+
+                <span>Both eyes must be open.</span>
               </li>
 
               <li className="flex gap-2">
                 <span className="text-[#0a9b87]">•</span>
-                <span>Looking away must remain detected before triggering.</span>
+
+                <span>Iris position must remain inside the allowed gaze range.</span>
               </li>
 
               <li className="flex gap-2">
                 <span className="text-[#0a9b87]">•</span>
-                <span>No face and multiple faces are also monitored.</span>
+
+                <span>MediaPipe eye-look blendshapes provide a second gaze check.</span>
               </li>
 
               <li className="flex gap-2">
                 <span className="text-[#0a9b87]">•</span>
-                <span>Detection is processed in the browser.</span>
+
+                <span>Detection runs directly in the browser.</span>
               </li>
             </ul>
           </section>
@@ -297,6 +423,34 @@ export default function AttentionMonitoringWorkspace() {
     </main>
   );
 }
+
+// =========================================================
+// DEBUG VALUE
+// =========================================================
+
+function DebugValue({ label, value, good }: { label: string; value: string | number; good?: boolean }) {
+  return (
+    <div className="rounded-lg bg-white/60 px-2.5 py-2 dark:bg-slate-950/30">
+      <p className="text-[9px] font-semibold uppercase tracking-wide opacity-50">{label}</p>
+
+      <p className={good === undefined ? "mt-0.5 font-bold" : good ? "mt-0.5 font-bold text-emerald-600 dark:text-emerald-400" : "mt-0.5 font-bold text-red-600 dark:text-red-400"}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+// =========================================================
+// FORMAT DEBUG NUMBER
+// =========================================================
+
+function formatDebugNumber(value: number) {
+  return value.toFixed(3);
+}
+
+// =========================================================
+// ATTENTION LABEL
+// =========================================================
 
 function getAttentionLabel(issue: MonitorIssue, isDetecting = true, isReady = true) {
   if (!isReady) {
@@ -320,9 +474,6 @@ function getAttentionLabel(issue: MonitorIssue, isDetecting = true, isReady = tr
     case "MULTIPLE_FACES":
       return "Multiple Faces";
 
-    case "SLEEPING":
-      return "Eyes Closed / Sleeping";
-
     case "CAMERA_OFF":
       return "Camera Off";
 
@@ -330,13 +481,17 @@ function getAttentionLabel(issue: MonitorIssue, isDetecting = true, isReady = tr
       return "Detection Error";
 
     default:
-      return "Checking";
+      return "Loading";
   }
 }
 
+// =========================================================
+// ATTENTION MESSAGE
+// =========================================================
+
 function getAttentionMessage(issue: MonitorIssue, isDetecting: boolean, isReady: boolean) {
   if (!isReady) {
-    return "Preparing face and hand detection models.";
+    return "Preparing face detection model.";
   }
 
   if (!isDetecting) {
@@ -345,19 +500,16 @@ function getAttentionMessage(issue: MonitorIssue, isDetecting: boolean, isReady:
 
   switch (issue) {
     case "LOOKING":
-      return "Eyes are open and participant is attentive.";
+      return "Both eyes are open and looking at the screen.";
 
     case "LOOKING_AWAY":
-      return "Participant is looking away from the screen.";
+      return "Eyes are not currently looking at the screen.";
 
     case "NO_FACE":
       return "No face is visible in the camera.";
 
     case "MULTIPLE_FACES":
       return "More than one face is visible.";
-
-    case "SLEEPING":
-      return "Eyes remained closed long enough to trigger the warning.";
 
     case "CAMERA_OFF":
       return "Camera is unavailable.";
@@ -370,63 +522,13 @@ function getAttentionMessage(issue: MonitorIssue, isDetecting: boolean, isReady:
   }
 }
 
-function getCheckingMessage(issue: MonitorIssue | null) {
-  switch (issue) {
-    case "SLEEPING":
-      return "Eyes appear closed. Checking if they remain closed...";
+// =========================================================
+// STATUS CLASSES
+// =========================================================
 
-    case "LOOKING_AWAY":
-      return "Possible looking away. Checking attention...";
-
-    case "NO_FACE":
-      return "Face temporarily not detected. Checking...";
-
-    case "MULTIPLE_FACES":
-      return "Multiple faces detected. Checking...";
-
-    case "CAMERA_OFF":
-      return "Camera signal may be unavailable. Checking...";
-
-    case "ERROR":
-      return "Possible detection issue. Checking...";
-
-    default:
-      return "Checking attention...";
-  }
-}
-
-function getRawIssueLabel(issue: MonitorIssue) {
-  switch (issue) {
-    case "SLEEPING":
-      return "Eyes Closed";
-
-    case "LOOKING_AWAY":
-      return "Looking Away";
-
-    case "NO_FACE":
-      return "No Face";
-
-    case "MULTIPLE_FACES":
-      return "Multiple Faces";
-
-    case "CAMERA_OFF":
-      return "Camera Off";
-
-    case "ERROR":
-      return "Error";
-
-    default:
-      return "Attentive";
-  }
-}
-
-function getStatusClasses(issue: MonitorIssue, isDetecting: boolean, isReady: boolean, isChecking: boolean) {
+function getStatusClasses(issue: MonitorIssue, isDetecting: boolean, isReady: boolean) {
   if (!isReady || !isDetecting) {
     return "border-gray-200 bg-gray-50 text-gray-600 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-300";
-  }
-
-  if (isChecking) {
-    return "border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400";
   }
 
   if (issue === "LOOKING") {
@@ -436,13 +538,13 @@ function getStatusClasses(issue: MonitorIssue, isDetecting: boolean, isReady: bo
   return "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-400";
 }
 
-function getStatusDot(issue: MonitorIssue, isDetecting: boolean, isReady: boolean, isChecking: boolean) {
+// =========================================================
+// STATUS DOT
+// =========================================================
+
+function getStatusDot(issue: MonitorIssue, isDetecting: boolean, isReady: boolean) {
   if (!isReady || !isDetecting) {
     return "bg-gray-400";
-  }
-
-  if (isChecking) {
-    return "bg-amber-500";
   }
 
   if (issue === "LOOKING") {
