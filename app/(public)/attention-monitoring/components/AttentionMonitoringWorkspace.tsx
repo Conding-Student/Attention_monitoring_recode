@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bug, Camera, CircleStop, Eye, Pause, Play, ScanFace } from "lucide-react";
 
 import { type MonitorIssue, useAttentionDetection } from "../hook/useAttentionDetection";
+import { useParentActivity } from "../hook/useParentActivity";
 
 // =========================================================
 // DEBUG UI
@@ -31,6 +32,8 @@ export default function AttentionMonitoringWorkspace({ token }: { token: string 
   const [isPlaying, setIsPlaying] = useState(false);
 
   const [isDetecting, setIsDetecting] = useState(false);
+
+  useParentActivity(demoVideoRef);
 
   const { isReady, issue, showWarning, debugInfo } = useAttentionDetection({
     token,
