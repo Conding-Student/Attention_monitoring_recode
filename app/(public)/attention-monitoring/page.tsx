@@ -5,6 +5,7 @@ import AttentionMonitoringCta from "./components/AttentionMonitoringCta";
 import DetectionStatesSection from "./components/DetectionStatesSection";
 import HowItWorksSection from "./components/HowItWorksSection";
 import PrivacySection from "./components/PrivacySection";
+import { cookies } from "next/headers";
 
 export default async function AttentionMonitoringPage({
 	searchParams,
@@ -12,7 +13,9 @@ export default async function AttentionMonitoringPage({
 	searchParams: Promise<{ token?: string | string[] }>;
 }) {
 	const { token: tokenParam } = await searchParams;
-	const token = typeof tokenParam === "string" ? tokenParam.trim() : "";
+	const token = tokenParam === undefined
+		? (await cookies()).get("auth_token")?.value.trim() ?? ""
+		: typeof tokenParam === "string" ? tokenParam.trim() : "";
 
 	if (!token) {
 		return (

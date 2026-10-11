@@ -8,6 +8,24 @@ const API_PUBLIC_PATHS = ["/api/auth/login", "/api/auth/logout"];
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Capture the embedding website's token before rendering the monitor.
+  if (pathname === "/attention-monitoring") {
+    const response = NextResponse.next();
+    const tokens = request.nextUrl.searchParams.getAll("token");
+    const incomingToken = tokens.length === 1 ? tokens[0].trim() : "";
+
+    if (incomingToken) {
+      response.cookies.set("auth_token", incomingToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: "/",
+      });
+    }
+
+    return response;
+  }
+
   // Allow public paths
   const isPublic = PUBLIC_PATHS.some(
     (path) => pathname === path || pathname.startsWith(path + "/"),
